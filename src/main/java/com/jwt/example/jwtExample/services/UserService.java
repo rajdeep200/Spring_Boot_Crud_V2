@@ -28,6 +28,15 @@ public class UserService {
         }
     }
 
+    public User getUserByEmail(String email) {
+        Optional<User> retrievedUser = userRepository.findByEmail(email);
+        if(retrievedUser.isPresent()) {
+            return retrievedUser.get();
+        }else {
+            throw new ResolutionException("User not found with Email: " + email);
+        }
+    }
+
     public User saveUser(User user) {
         return userRepository.save(user);
     }
