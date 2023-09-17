@@ -1,5 +1,6 @@
 package com.jwt.example.jwtExample.config;
 
+import com.jwt.example.jwtExample.Entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,29 +26,30 @@ public class JWTService {
     }
 
     // generate token with UserDetails only
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
     // generate token with extra claims
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
+            User userDetails
     ) {
+//        System.out.println("Jwt Username ==>> " + userDetails.getEmail());
         return Jwts
                 .builder() // The 'builder' method creates a builder object that allows you to configure and build a jwt
                 .setClaims(extraClaims) // This sets the claims (payload) of the JWT using the extraClaims parameter
-                .setSubject(userDetails.getUsername()) // Sets the subject of the JWT. In this case, it's setting the subject to the username obtained from the userDetails object.
+                .setSubject(userDetails.getEmail()) // Sets the subject of the JWT. In this case, it's setting the subject to the username obtained from the userDetails object.
                 .setIssuedAt(new Date(System.currentTimeMillis())) // Sets the "issued at" (iat) claim of the JWT, indicating when the token was issued.
-                .setExpiration(new Date(System.currentTimeMillis() + 1000*60)) // Sets the expiration time of the JWT. It's set to be one minute (60,000 milliseconds) after the current time.
+                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24)) // Sets the expiration time of the JWT. It's set to be one minute (60,000 milliseconds) after the current time.
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256) // Signs the JWT using a signing key obtained from the getSignInKey() method (not shown in the provided code). It specifies the algorithm used for signing the token, which is HMAC SHA-256 (HS256) in this case.
                 .compact(); // It will build the JWT and return it as a compact string representation
     }
 
     // check is token valid
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, User user) {
         final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return username.equals(user.getEmail()) && !isTokenExpired(token);
     }
 
     // check if token expired
